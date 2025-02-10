@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GHETT OUT</title>
+  <link rel="stylesheet" href="intro.css" />
+</head>
+<body>
+
+  <div class="image-container">
+    <img src="assets/title.png" alt="GHETT OUT Screen" usemap="#ghettoutmap" id="titleImage" />
+    <map name="ghettoutmap">
+      <area shape="rect" coords="242,466,640,610" alt="GHETT OUT" href="#" onclick="startTransition(event)" ontouchstart="startTransition(event)">
+    </map>
+  </div>
+
+  <!-- Leaderboard button (clickable) -->
+  <a href="allscores.html" id="leaderboard">
+    <img src="assets/leaderboard.png" alt="Leaderboard" />
+  </a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
+  <script src="intro.js"></script>
+</body>
+</html>

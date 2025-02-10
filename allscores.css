@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+body {
+    background-color: black;
+    color: #00ff00;
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+}
+
+/* Fixed Heading */
+.header-container {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: black;
+    padding: 10px 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Glowing "ALL SCORES" Title */
+.title {
+    font-size: 3rem;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.glow {
+    color: #ffcc00;
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff9900, 0 0 40px #ff6600;
+}
+
+/* Download Button */
+.download-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.download-btn img {
+    width: 30px;
+    height: 30px;
+}
+
+.download-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Scrollable Table Container */
+.table-container {
+    width: 90%;
+    max-width: 800px;
+    margin-top: 60px; /* Adjusted margin for spacing */
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid #00ff00;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Custom Scrollbar */
+.table-container::-webkit-scrollbar {
+    width: 8px; /* Reduced width */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #00ff00; /* Font color */
+    border-radius: 5px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: black;
+}
+
+/* Firefox scrollbar */
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #00ff00 black;
+}
+
+/* Leaderboard Table */
+#leaderboard {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Sticky Table Header */
+#leaderboard th, #leaderboard td {
+    padding: 10px;
+    border-bottom: 1px solid #00ff00;
+    text-align: left;
+}
+
+#leaderboard th {
+    background-color: #002200;
+    color: #00ff00;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Alternating Row Colors */
+#leaderboard tbody tr:nth-child(odd) {
+    background-color: rgba(0, 50, 0, 0.2);
+}
+
+#leaderboard tbody tr:hover {
+    background-color: rgba(0, 100, 0, 0.5);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .table-container {
+        max-height: 50vh;
+    }
+
+    #leaderboard th, #leaderboard td {
+        font-size: 1rem;
+    }
+
+    .download-btn img {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .table-container {
+        max-height: 45vh;
+    }
+
+    #leaderboard th, #leaderboard td {
+        font-size: 0.9rem;
+    }
+
+    .download-btn img {
+        width: 20px;
+        height: 20px;
+    }
+}

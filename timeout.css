@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+body {
+    background-color: black;
+    color: #00ff00;
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+}
+
+/* Typing effect text */
+#timeout-text {
+    font-size: 2rem;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #008000;
+    white-space: pre-wrap;
+    overflow: hidden;
+    display: inline-block;
+}
+
+/* Hourglass Animation */
+.hourglass-container {
+    margin: 20px auto;
+}
+
+#hourglass {
+    width: 120px;
+    height: auto;
+}
+
+/* Container for message and email; left-aligned */
+#text-container {
+    text-align: left;       /* Left-align the text */
+    margin: 20px auto;       /* Center the container horizontally */
+    width: fit-content;      /* Container width adjusts to content */
+}
+
+/* Styling for the second text line */
+#message-text {
+    font-size: 1.5rem;
+    margin-top: 50px;       /* Adjusted to match desired positioning */
+    text-shadow: 0 0 5px #00ff00;
+    white-space: pre-wrap;
+    overflow: hidden;
+    display: inline-block;
+}
+
+/* Email container inherits left alignment from #text-container */
+#email-container {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* Ensure spans inside email container are inline-block */
+#email-container span {
+    display: inline-block;
+}
+
+/* Blinking Cursor */
+.cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}

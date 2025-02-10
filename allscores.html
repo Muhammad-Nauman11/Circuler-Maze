@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Scores Leaderboard</title>
+    <link rel="stylesheet" href="allscores.css">
+</head>
+<body>
+
+    <!-- Fixed Heading Section -->
+    <div class="header-container">
+        <h1 class="title glow">ALL SCORES</h1>
+        <button id="downloadExcel" class="download-btn" title="Export to csv">
+            <img src="assets/export-excel.png" alt="Download">
+        </button>
+    </div>
+
+    <!-- Scrollable Table Container -->
+    <div class="table-container">
+        <table id="leaderboard">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Email</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Scores will be loaded dynamically here -->
+            </tbody>
+        </table>
+    </div>
+    <script src="allscores.js"></script>
+</body>
+</html>

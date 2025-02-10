@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timeout Page</title>
+  <link rel="stylesheet" href="timeout.css">
+</head>
+<body>
+  <div class="container">
+    <p id="timeout-text"></p> <!-- First line animation -->
+
+    <!-- Hourglass Animation -->
+    <div class="hourglass-container">
+      <img src="assets/hourglass.gif" id="hourglass" alt="Hourglass">
+    </div>
+
+    <!-- Wrap message and email in a left-aligned container -->
+    <div id="text-container">
+      <p id="message-text"></p> <!-- Second line animation -->
+      <p id="email-container">
+        <span id="emailText"></span> <span id="emailDisplay"></span><span class="cursor">█</span>
+      </p>
+    </div>
+  </div>
+  <script src="timeout.js"></script>
+</body>
+</html>

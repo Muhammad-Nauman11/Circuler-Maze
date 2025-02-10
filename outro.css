@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+body {
+    background-color: black;
+    color: #00ff00;
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 80%;
+}
+
+/* Typing effect text */
+#animated-text {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px #00ff00;
+    overflow: hidden;
+    display: inline-block;
+}
+
+/* Spinning Earth */
+.earth-container {
+    margin: 20px auto;
+}
+
+#spinning-earth {
+    width: 120px;
+    height: 120px;
+}
+
+/* Second Message */
+#message-text {
+    font-size: 1.5rem;
+    margin-top: 20px;
+    text-shadow: 0 0 5px #00ff00;
+    white-space: pre-wrap;
+    overflow: hidden;
+    display: inline-block;
+}
+
+/* Email Section */
+#email-container {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex; /* Use flex to control alignment */
+    justify-content: flex-start; /* Aligns text to the left */
+    width: 100%; /* Ensures it takes full width */
+    max-width: 500px; /* Optional: Limits how wide it stretches */
+    margin: 0 auto; /* Centers the block itself */
+    text-shadow: 0 0 5px #00ff00;
+}
+
+#email-container span {
+    display: inline-block; /* Prevents weird inline shifts */
+}
+
+
+/* Blinking Cursor */
+.cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
