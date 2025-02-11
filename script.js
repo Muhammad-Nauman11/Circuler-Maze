@@ -259,7 +259,7 @@ const gameObjects = []; // Store all objects in the maze
 
 const images = {
     "cash": { src: "assets/cash.png", size: 25, effect: () => { score += 100; } },
-    "coins": { src: "assets/coins.png", size: 25, effect: () => { score += 50; } },
+    "coins": { src: "assets/coins.png", size: 25, effect: () => { score += 20; } },
     "heart": { src: "assets/heart.png", size: 25, effect: () => { extendTime(30000); } },
     "syringe": { src: "assets/syringe.png", size: 25, effect: () => { isMovedToCenter = true;} },
     "powder": { src: "assets/powder.png", size: 25, effect: () => { isMovedToCenter = true;} },
