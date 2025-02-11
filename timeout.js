@@ -33,14 +33,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function enableEmailTyping() {
         isTypingEnabled = true;
+        // Existing desktop behavior: listen for keydown events
         document.addEventListener("keydown", handleTyping);
+        // For mobile: add an input event listener to the hidden input field
+        const hiddenInput = document.getElementById("hiddenInput");
+        if (hiddenInput) {
+            hiddenInput.addEventListener("input", handleInput);
+        }
     }
 
     function handleTyping(event) {
         if (!isTypingEnabled) return;
-
         const allowedCharacters = /^[a-zA-Z0-9@._-]$/;
-
         if (event.key === "Backspace") {
             email = email.slice(0, -1);
         } else if (event.key === "Enter") {
@@ -49,7 +53,16 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (allowedCharacters.test(event.key)) {
             email += event.key;
         }
+        updateEmailDisplay();
+    }
 
+    // New function: handles mobile input events from the hidden input field
+    function handleInput(event) {
+        email = event.target.value;
+        updateEmailDisplay();
+    }
+
+    function updateEmailDisplay() {
         document.getElementById("emailDisplay").textContent = email;
     }
 
@@ -59,20 +72,16 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Invalid email. Please enter a valid email.");
             return;
         }
-
         // Save email to localStorage
         localStorage.setItem("playerEmail", email);
-
         // Get score from localStorage if it exists
         const score = localStorage.getItem("score") || "0"; // Default to 0 if no score
         const playerName = email.split("@")[0]; // Extract name from email
-
         saveScoreToGoogleSheet(playerName, email, score);
     }
 
     function saveScoreToGoogleSheet(name, email, score) {
         const sheetDB_URL = "https://sheetdb.io/api/v1/6wiatogjrsk32";
-
         fetch(sheetDB_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -89,6 +98,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     typeEffect(); // Start typing effect
 });
+
+// When the cursor is clicked, focus the hidden input so the mobile keyboard appears.
 document.querySelector(".cursor").addEventListener("click", function () {
     let input = document.getElementById("hiddenInput");
     input.style.pointerEvents = "auto"; // Allow input to receive focus
