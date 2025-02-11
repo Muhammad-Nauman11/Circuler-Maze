@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const hiddenInput = document.getElementById("hiddenInput");
 
     hiddenInput.addEventListener("input", function(event) {
-        const email = event.target.value; // Get the input value
+        email = event.target.value; // Get the input value
         document.getElementById("emailDisplay").textContent = email; // Update the display
     });
     
