@@ -33,22 +33,17 @@ body {
     pointer-events: none; /* Make it non-clickable */
 }
 
-#hourglass {
-    width: 150px;
-    height: auto;
-}
-
 /* Container for message and email; left-aligned */
 #text-container {
-    text-align: left;       /* Left-align the text */
-    margin: 20px auto;       /* Center the container horizontally */
-    width: fit-content;      /* Container width adjusts to content */
+    text-align: left;
+    margin: 20px auto;
+    width: fit-content;
 }
 
 /* Styling for the second text line */
 #message-text {
     font-size: 1.5rem;
-    margin-top: 10px;       /* Adjusted to match desired positioning */
+    margin-top: 10px;
     text-shadow: 0 0 5px #00ff00;
     white-space: pre-wrap;
     overflow: hidden;
@@ -93,6 +88,11 @@ body {
     #hourglass {
         width: 120px;
     }
+
+    #hiddenInput {
+        opacity: 1; /* Make it visible on mobile when typing */
+        width: 200px; /* Set the width for mobile input */
+    }
 }
 
 /* 🔹 Responsive adjustments for mobile phones */
@@ -111,5 +111,10 @@ body {
 
     #hourglass {
         width: 100px;
+    }
+
+    #hiddenInput {
+        opacity: 1; /* Make it visible on mobile when typing */
+        width: 200px; /* Set the width for mobile input */
     }
 }

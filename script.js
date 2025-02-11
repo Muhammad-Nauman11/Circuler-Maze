@@ -312,27 +312,23 @@ canvas.addEventListener("touchstart", () => {
     playMusic();
 });
 
+// ----- Collision Detection for Game Objects -----
 function checkCollisions() {
   for (let obj of gameObjects) {
+    // Only process objects that haven't been marked as collided.
     if (!obj.collided) {
-      // Circle to AABB (bounding box) collision
-      let closestX = Math.max(obj.x - obj.size / 2, Math.min(circle.x, obj.x + obj.size / 2));
-      let closestY = Math.max(obj.y - obj.size / 2, Math.min(circle.y, obj.y + obj.size / 2));
-      let distance = Math.hypot(circle.x - closestX, circle.y - closestY);
+      // Compute closest point on the object's bounding box to the circle.
+      const halfSize = obj.size / 2;
+      const closestX = Math.max(obj.x - halfSize, Math.min(circle.x, obj.x + halfSize));
+      const closestY = Math.max(obj.y - halfSize, Math.min(circle.y, obj.y + halfSize));
+      const distance = Math.hypot(circle.x - closestX, circle.y - closestY);
 
-      // Debugging log to check the distance
-      
+      // If the ball is overlapping the object, process the collision.
       if (distance < circle.radius) {
-        // Only apply effect and sound if collision is true
-        if (!obj.collided) {
-          obj.effect();      // Apply effect (e.g., increase score)
-          obj.collided = true; // Mark as collided
-
-          // Start the fade animation and play sound only if collision is valid
-          startFading(obj);
-          playSound(obj);    // Play sound
-
-        }
+        obj.effect();          // Apply the object's effect (score, time, etc.)
+        obj.collided = true;   // Mark this object as collided so it won't be processed again.
+        startFading(obj);      // Begin fading out the collided object.
+        playSound(obj);        // Play its associated sound.
       }
     }
   }
@@ -441,39 +437,49 @@ function generateGameObjects() {
   }
 }
 
-// Draw images on the canvas with fading effect
 function drawGameObjects() {
-    for (let obj of gameObjects) {
-        if (obj.opacity > 0 && obj.image) {
-            ctx.globalAlpha = obj.opacity;
-            ctx.drawImage(obj.image, obj.x - obj.size / 2, obj.y - obj.size / 2, obj.size, obj.size);
-            ctx.globalAlpha = 1; // Reset transparency
-        }
+  for (let obj of gameObjects) {
+    if (obj.image) {
+      ctx.globalAlpha = obj.opacity; // Use the current opacity for fading.
+      ctx.drawImage(
+        obj.image,
+        obj.x - obj.size / 2,
+        obj.y - obj.size / 2,
+        obj.size,
+        obj.size
+      );
+      ctx.globalAlpha = 1; // Reset alpha for subsequent drawing.
     }
-}
-
-function startFading(obj) {
-  // If the object isn't already fading, start the fade animation
-  if (!obj.fading) {
-      obj.fading = true;
-      obj.opacity = 1; // Ensure opacity starts at 1 for a fresh fade
-
-      fadeStep(obj); // Start the fade animation
   }
 }
 
-function fadeStep(obj) {
-  // Gradually reduce opacity
-  if (obj.opacity > 0) {
-      obj.opacity -= 0.05; // Reduce opacity more slowly (smaller value for slower fade)
+// ----- Fading Functions -----
+function startFading(obj) {
+  // Ensure we only start fading once per object.
+  if (!obj.fading) {
+    obj.fading = true;
+    obj.opacity = 1;  // Start fully opaque.
+    fadeStep(obj);
+  }
+}
 
-      // Request the next frame for the fade animation
-      requestAnimationFrame(() => fadeStep(obj)); // Keep fading until opacity is 0
+
+function fadeStep(obj) {
+  // Gradually decrease the opacity.
+  if (obj.opacity > 0) {
+    obj.opacity -= 0.05; // Adjust the decrement for the desired fade speed.
+    requestAnimationFrame(() => fadeStep(obj));
   } else {
-      obj.opacity = 0; // Ensure opacity reaches exactly 0
-      obj.fading = false; // Mark as no longer fading
-      gameObjects.splice(gameObjects.indexOf(obj), 1); // Optionally remove from gameObjects array
-      redraw();
+    // Once fully faded, ensure opacity is exactly 0,
+    // mark fading as complete, and remove the object.
+    obj.opacity = 0;
+    obj.fading = false;
+    const index = gameObjects.indexOf(obj);
+    if (index > -1) {
+      gameObjects.splice(index, 1);
+    }
+    // Redraw to update the display.
+    redraw();
   }
 }
 

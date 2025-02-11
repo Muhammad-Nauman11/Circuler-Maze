@@ -5,6 +5,7 @@ body {
     height: 100vh;
     background-color: #222;
 }
+
 canvas {
     background-color: #222;
 }
@@ -19,6 +20,7 @@ canvas {
     width: 50px;
     height: 50px;
 }
+
 /* For smaller screens like tablets */
 @media (max-width: 768px) {
     canvas {
@@ -35,9 +37,11 @@ canvas {
     
     canvas {
         width: 95%;
-        height: 60%;
+        aspect-ratio: 1 / 1;  /* Ensures the canvas stays square */
+        height: auto;         /* Height will adjust automatically to maintain the aspect ratio */
     }
 }
+
 #hud {
     position: absolute;
     top: 10px;
