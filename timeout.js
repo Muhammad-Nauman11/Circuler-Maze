@@ -1,20 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
     const texts = [
-        { element: "timeout-text", text: "OUT OF TIME." },
-        { element: "message-text", text: "ENTER YOUR PLAY TO STAY CONNECTED." },
-        { element: "emailText", text: "EMAIL " }
+        { element: "timeout-text", text: "OUT OF TIME.", speed: 50 },
+        { element: "message-text", text: "ENTER YOUR PLAY TO STAY CONNECTED.", speed: 100 },
+        { element: "emailText", text: "EMAIL", speed: 100 }
     ];
     
     let index = 0;
     let textIndex = 0;
-    const speed = 100;
     let email = "";
     let isTypingEnabled = false;
 
     function typeEffect() {
         const currentText = texts[textIndex];
         const targetElement = document.getElementById(currentText.element);
-        
+        const speed = texts[textIndex].speed;
         if (index < currentText.text.length) {
             targetElement.innerHTML += currentText.text.charAt(index);
             index++;
@@ -89,4 +88,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     typeEffect(); // Start typing effect
+});
+document.querySelector(".cursor").addEventListener("click", function () {
+    let input = document.getElementById("hiddenInput");
+    input.style.pointerEvents = "auto"; // Allow input to receive focus
+    input.focus();
+    input.style.pointerEvents = "none"; // Hide it again after focus
 });

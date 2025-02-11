@@ -254,7 +254,7 @@ let allowedPaths = [];
 ctx.imageSmoothingEnabled = true;
 ctx.imageSmoothingQuality = "high"; // Optional: "low", "medium", or "high"
 let isMovedToCenter = false;
-const numSprites = 20; // Number of sprites to display
+const numSprites = 25; // Number of sprites to display
 const gameObjects = []; // Store all objects in the maze
 
 const images = {
@@ -361,56 +361,85 @@ function playSoundSegment(type) {
 }
 
 
-
-
-
 function preloadImages(callback) {
-    let count = 0;
-    let total = Object.keys(images).length;
-
-    for (let key in images) {
-        let img = new Image();
-        img.src = images[key].src;
-        img.onload = () => {
-            loadedImages[key] = img;
-            count++;
-            if (count === total) callback(); // Run callback after all images are loaded
-        };
-    }
+  let count = 0;
+  const total = Object.keys(images).length;
+  for (let key in images) {
+    let img = new Image();
+    img.src = images[key].src;
+    img.onload = () => {
+      loadedImages[key] = img;
+      count++;
+      if (count === total) {
+        // All images are loaded—start the game!
+        callback();
+      }
+    };
+    img.onerror = () => {
+      console.error(`Error loading image: ${images[key].src}`);
+      count++;
+      if (count === total) {
+        callback();
+      }
+    };
+  }
 }
 
 function generateGameObjects() {
-  gameObjects.length = 0;  // Clear existing game objects
+  // Clear any existing game objects.
+  gameObjects.length = 0;
 
+  // Use candidate cells from all rings except the innermost.
   const candidateCells = [];
-  for (let i = 1; i < grid.length; i++) { // Skip innermost ring
+  for (let i = 1; i < grid.length; i++) { 
       candidateCells.push(...grid[i]);
   }
 
+  // Weighted probabilities: rewards have higher weights than punishments.
+  const weightedImageKeys = [
+      { key: "cash",    weight: 3 },
+      { key: "coins",   weight: 3 },
+      { key: "heart",   weight: 2 },
+      { key: "syringe", weight: 1 },
+      { key: "powder",  weight: 1 },
+      { key: "skull",   weight: 1 },
+      { key: "siren",   weight: 1 }
+  ];
+  const totalWeight = weightedImageKeys.reduce((sum, item) => sum + item.weight, 0);
+
   while (gameObjects.length < numSprites && candidateCells.length > 0) {
+      // Pick a random cell and remove it from candidates.
       let randIndex = Math.floor(Math.random() * candidateCells.length);
       let cell = candidateCells[randIndex];
-      candidateCells.splice(randIndex, 1);  // Remove the selected cell
+      candidateCells.splice(randIndex, 1);
 
       if (cell.centroid) {
-          let selectedKey = Object.keys(images)[Math.floor(Math.random() * Object.keys(images).length)];
+          // Perform weighted random selection.
+          let randomWeight = Math.random() * totalWeight;
+          let selectedKey;
+          for (let item of weightedImageKeys) {
+              randomWeight -= item.weight;
+              if (randomWeight <= 0) {
+                  selectedKey = item.key;
+                  break;
+              }
+          }
           let selectedImage = images[selectedKey];
 
           gameObjects.push({
               type: selectedKey,
               x: cell.centroid.x,
               y: cell.centroid.y,
-              image: loadedImages[selectedKey], // Use preloaded images
-              size: images[selectedKey].size,
+              image: loadedImages[selectedKey],
+              size: selectedImage.size,
               effect: selectedImage.effect,
-              opacity: 1,  // Start fully visible
-              fading: false, // Not fading initially
-              collided: false // Ensure it disappears only once
+              opacity: 1,       // Fully visible at start.
+              fading: false,    // Not fading initially.
+              collided: false   // Collision only triggers once.
           });
       }
   }
 }
-
 
 // Draw images on the canvas with fading effect
 function drawGameObjects() {
@@ -1579,11 +1608,8 @@ function getEventCoordinates(e) {
  * @returns {Object} - The furthest valid point { x, y }.
  */
 function getMaxAllowedPosition(start, candidate, ball) {
-  let lo = 0;
-  let hi = 1;
-  let allowedT = 0;  // t value along the segment where movement is allowed
-  const iterations = 20; // number of binary search iterations (adjust as needed)
-
+  let lo = 0, hi = 1, allowedT = 0;
+  const iterations = 20;
   for (let i = 0; i < iterations; i++) {
     let mid = (lo + hi) / 2;
     let testX = start.x + (candidate.x - start.x) * mid;
@@ -1600,7 +1626,6 @@ function getMaxAllowedPosition(start, candidate, ball) {
     y: start.y + (candidate.y - start.y) * allowedT
   };
 }
-
 
   // ***** Drawing *****
 
@@ -1781,22 +1806,22 @@ function redraw() {
   updateGameObjects(); // Handle fading animations
 }
 
-  // ***** Initialization *****
+// ===== Initialization =====
 
+// Instead of starting immediately, we now wait until all images are loaded.
+preloadImages(() => {
+  // Now that images are ready, initialize the maze/game.
   createConcentricCircles(300, 300);
   findNeighbors();
   generateMaze();
   buildGraph();
   if (grid[0] && grid[0][0] && grid[0][0].centroid) {
-      circle.x = grid[0][0].centroid.x;
-      circle.y = grid[0][0].centroid.y;
-    }
-breakRandomOuterWall();
-generateGameObjects();
-startTimer();
-// Load images first, then start game
-preloadImages(() => {
+    circle.x = grid[0][0].centroid.x;
+    circle.y = grid[0][0].centroid.y;
+  }  
+  breakRandomOuterWall();
   generateGameObjects();
+  startTimer();
   redraw();
 });
 

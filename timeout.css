@@ -27,9 +27,14 @@ body {
 .hourglass-container {
     margin: 20px auto;
 }
+#hiddenInput {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none; /* Make it non-clickable */
+}
 
 #hourglass {
-    width: 120px;
+    width: 150px;
     height: auto;
 }
 
@@ -43,7 +48,7 @@ body {
 /* Styling for the second text line */
 #message-text {
     font-size: 1.5rem;
-    margin-top: 50px;       /* Adjusted to match desired positioning */
+    margin-top: 10px;       /* Adjusted to match desired positioning */
     text-shadow: 0 0 5px #00ff00;
     white-space: pre-wrap;
     overflow: hidden;
@@ -54,7 +59,7 @@ body {
 #email-container {
     font-size: 1.2rem;
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 /* Ensure spans inside email container are inline-block */
@@ -69,4 +74,42 @@ body {
 
 @keyframes blink {
     50% { opacity: 0; }
+}
+
+/* 🔹 Responsive adjustments for tablets */
+@media screen and (max-width: 768px) {
+    #timeout-text {
+        font-size: 1.5rem;
+    }
+
+    #message-text {
+        font-size: 1.2rem;
+    }
+
+    #email-container {
+        font-size: 1rem;
+    }
+
+    #hourglass {
+        width: 120px;
+    }
+}
+
+/* 🔹 Responsive adjustments for mobile phones */
+@media screen and (max-width: 480px) {
+    #timeout-text {
+        font-size: 1.2rem;
+    }
+
+    #message-text {
+        font-size: 1rem;
+    }
+
+    #email-container {
+        font-size: 0.9rem;
+    }
+
+    #hourglass {
+        width: 100px;
+    }
 }

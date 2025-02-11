@@ -20,14 +20,18 @@ body {
 /* Typing effect text */
 #animated-text {
     font-size: 1.2rem;
-    line-height: 1.5;
+    line-height: 1.2;
     white-space: pre-wrap;
     text-transform: uppercase;
     text-shadow: 0 0 5px #00ff00;
     overflow: hidden;
     display: inline-block;
 }
-
+#hiddenInput {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none; /* Make it non-clickable */
+}
 /* Spinning Earth */
 .earth-container {
     margin: 20px auto;
@@ -41,7 +45,7 @@ body {
 /* Second Message */
 #message-text {
     font-size: 1.5rem;
-    margin-top: 20px;
+    margin-top: 5px;
     text-shadow: 0 0 5px #00ff00;
     white-space: pre-wrap;
     overflow: hidden;
@@ -72,4 +76,26 @@ body {
 
 @keyframes blink {
     50% { opacity: 0; }
+}
+
+@media screen and (max-width: 768px) { /* Adjusts for tablets and smaller */
+    #message-text, #email-container, #animated-text {
+        font-size: 0.9rem;
+    }
+    
+    #spinning-earth {
+        width: 90px;
+        height: 90px;
+    }
+}
+
+@media screen and (max-width: 480px) { /* Adjusts for phones */
+    #message-text, #email-container, #animated-text {
+        font-size: 0.8rem;
+    }
+
+    #spinning-earth {
+        width: 70px;
+        height: 70px;
+    }
 }

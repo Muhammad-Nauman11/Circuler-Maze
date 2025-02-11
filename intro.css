@@ -1,80 +1,80 @@
-/* Reset default spacing */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+  /* Reset default spacing */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-/* Full viewport with a black background */
-body {
-  background-color: black;
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  overflow: hidden;
-}
+  /* Full viewport with a black background */
+  body {
+    background-color: black;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-/* Container for the title image */
-.image-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-}
-
-/* Ensure the title image scales like a background image */
-#titleImage {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* Keeps the entire image visible without cropping */
-}
-
-/* Leaderboard button - always fixed over the image */
-#leaderboard {
-  position: fixed;
-  bottom: 10vh;         /* Adjusts from the bottom of the viewport */
-  left: 50%;            /* Position left edge at center */
-  transform: translateX(-50%);  /* Shift back by half its width */
-  z-index: 100;         /* Ensure it appears on top */
-}
-
-/* Leaderboard image (desktop) */
-#leaderboard img {
-  width: 70px;  /* Fixed width for desktop */
-  height: auto;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-}
-
-/* Hover effect */
-#leaderboard img:hover {
-  transform: scale(1.1);
-}
-
-/* Click (active) effect */
-#leaderboard img:active {
-  transform: scale(0.9);
-  opacity: 0.6;
-}
-
-/* Media Query for Mobile */
-@media (max-width: 768px) {
-  /* For mobile, let the container and image use full width */
+  /* Container for the title image */
   .image-container {
+    position: relative;
     width: 100%;
     height: 100vh;
   }
-  
+
+  /* Ensure the title image scales like a background image */
   #titleImage {
+    display: block;
     width: 100%;
     height: 100%;
+    object-fit: contain; /* Keeps the entire image visible without cropping */
   }
 
-  /* Leaderboard image becomes smaller on mobile */
-  #leaderboard img {
-    width: 50px;
+  /* Leaderboard button - always fixed over the image */
+  #leaderboard {
+    position: fixed;
+    bottom: 10vh;         /* Adjusts from the bottom of the viewport */
+    left: 50%;            /* Position left edge at center */
+    transform: translateX(-50%);  /* Shift back by half its width */
+    z-index: 100;         /* Ensure it appears on top */
   }
-}
+
+  /* Leaderboard image (desktop) */
+  #leaderboard img {
+    width: 70px;  /* Fixed width for desktop */
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  }
+
+  /* Hover effect */
+  #leaderboard img:hover {
+    transform: scale(1.1);
+  }
+
+  /* Click (active) effect */
+  #leaderboard img:active {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+
+  /* Media Query for Mobile */
+  @media (max-width: 768px) {
+    /* For mobile, let the container and image use full width */
+    .image-container {
+      width: 100%;
+      height: 100vh;
+    }
+    
+    #titleImage {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Leaderboard image becomes smaller on mobile */
+    #leaderboard img {
+      width: 50px;
+    }
+  }

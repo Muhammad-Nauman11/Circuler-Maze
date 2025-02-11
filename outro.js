@@ -1,20 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
     const texts = [
-        { element: "animated-text", text: "THE WORLD IS NOW YOUR OYSTER.\nYOU LEARNED THE RULES AND PLAYED\nTHE GAME WELL, YOU ARE NOW\nCLASSIFIED AS A FREE-MINDED\nCITIZEN. THOSE LEFT BEHIND MAY\nSTART TO VIEW YOU DIFFERENTLY\nAND VICE VERSA. BE PREPARED,\nSTAY FOCUSED, AND KEEP YOUR\nFREQUENCY LEVEL HIGH." },
-        { element: "message-text", text: "ENTER YOUR PLAY TO STAY CONNECTED." },
-        { element: "emailText", text: "EMAIL " }
+        { element: "animated-text", text: "THE WORLD IS NOW YOUR OYSTER.\nYOU LEARNED THE RULES AND PLAYED\nTHE GAME WELL, YOU ARE NOW\nCLASSIFIED AS A FREE-MINDED\nCITIZEN. THOSE LEFT BEHIND MAY\nSTART TO VIEW YOU DIFFERENTLY\nAND VICE VERSA. BE PREPARED,\nSTAY FOCUSED, AND KEEP YOUR\nFREQUENCY LEVEL HIGH.", speed: 30 },
+        { element: "message-text", text: "ENTER YOUR PLAY TO STAY CONNECTED.", speed: 50 },
+        { element: "emailText", text: "EMAIL ", speed: 50 }
     ];
     
     let index = 0;
     let textIndex = 0;
-    const speed = 50;
     let email = "";
     let isTypingEnabled = false;
 
     function typeEffect() {
         const currentText = texts[textIndex];
         const targetElement = document.getElementById(currentText.element);
-        
+        const speed = texts[textIndex].speed;
         if (index < currentText.text.length) {
             targetElement.innerHTML += currentText.text.charAt(index);
             index++;
@@ -88,4 +87,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     typeEffect(); // Start typing effect
+});
+document.querySelector(".cursor").addEventListener("click", function () {
+    let input = document.getElementById("hiddenInput");
+    input.style.pointerEvents = "auto"; // Allow input to receive focus
+    input.focus();
+    input.style.pointerEvents = "none"; // Hide it again after focus
 });
