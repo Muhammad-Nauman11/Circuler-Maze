@@ -10,6 +10,19 @@ document.addEventListener("DOMContentLoaded", function () {
     let email = "";
     let isTypingEnabled = false;
 
+    document.querySelector(".cursor").addEventListener("click", function () {
+        let input = document.getElementById("hiddenInput");
+        input.style.pointerEvents = "auto"; // Allow input to receive focus
+        input.focus();
+        input.style.pointerEvents = "none"; // Hide it again after focus
+    });
+
+    const hiddenInput = document.getElementById("hiddenInput");
+
+    hiddenInput.addEventListener("input", function(event) {
+        email = event.target.value; // Get the input value
+        document.getElementById("emailDisplay").textContent = email; // Update the display
+    });
     function typeEffect() {
         const currentText = texts[textIndex];
         const targetElement = document.getElementById(currentText.element);
@@ -87,10 +100,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     typeEffect(); // Start typing effect
-});
-document.querySelector(".cursor").addEventListener("click", function () {
-    let input = document.getElementById("hiddenInput");
-    input.style.pointerEvents = "auto"; // Allow input to receive focus
-    input.focus();
-    input.style.pointerEvents = "none"; // Hide it again after focus
 });

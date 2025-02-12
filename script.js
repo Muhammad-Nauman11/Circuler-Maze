@@ -234,7 +234,7 @@ class Point {
   canvas.height = mazeHeight;
 
 let score = 0;
-let timeRemaining = 60000; // Initial time in milliseconds (example: 60s)
+let timeRemaining = 600000; // Initial time in milliseconds (example: 60s)
 let timeoutId;
 let intervalId;
 
@@ -242,14 +242,8 @@ let intervalId;
 let finishGraphNode = null;
 // Global array to store allowed edges (paths) between graph nodes.
 let allowedPaths = [];
-  // Global flag for game over.
-  let gameOver = false;
-  let keysPressed = {
-    ArrowUp: false,
-    ArrowDown: false,
-    ArrowLeft: false,
-    ArrowRight: false
-  };
+// Global flag for game over.
+let gameOver = false;
 
 ctx.imageSmoothingEnabled = true;
 ctx.imageSmoothingQuality = "high"; // Optional: "low", "medium", or "high"
@@ -1399,7 +1393,7 @@ function pointLineDistance(point, lineStart, lineEnd) {
 
 
   function getCurrentGraphNode() {
-    const snapThreshold = 20;
+    const snapThreshold = 10;
     for (let node of graphNodes) {
       if (distanceBetweenPoints(circle, node.pos) < snapThreshold) {
         return node;
@@ -1408,107 +1402,214 @@ function pointLineDistance(point, lineStart, lineEnd) {
     return null;
   }
   let lastGraphNode = null;
+// ----------------------
+// Global variables for key handling
+// ----------------------
+let keysPressed = {
+  ArrowUp: false,
+  ArrowDown: false,
+  ArrowLeft: false,
+  ArrowRight: false
+};
+let moveInterval = null;
+let isMoving = false;  // prevents overlapping move animations
 
-/**
- * Chooses the next graph node.
- *
- * If there is only one valid neighbor (after excluding the node we just came from),
- * returns that node immediately—allowing the ball to automatically progress along a corridor.
- * Otherwise, it uses the pointer (mouse/touch) movement direction (via dot products)
- * to select the neighbor that best aligns with the user's movement.
- *
- * @param {Object} currentNode - The current graph node.
- * @param {Object} direction - The pointer movement direction, e.g. { x: dx, y: dy }.
- * @returns {Object|null} The chosen neighbor node, or null if none qualifies.
- */
-function chooseNextNode(currentNode, direction) {
-  // Get all valid neighbors (neighbors that exist and whose connecting edge isn’t blocked).
-  let validNeighbors = currentNode.neighbors
-    .map(id => graphNodes.find(n => n.id === id))
-    .filter(neighbor => neighbor && !isEdgeBlocked(currentNode, neighbor));
+// ----------------------
+// Compute the desired direction from currently pressed keys.
+// (Uses screen coordinates: right is +X, down is +Y. So pressing ArrowUp and ArrowRight gives {x:0.707, y:-0.707})
+// ----------------------
+function getDesiredDirection() {
+  let dx = 0, dy = 0;
+  if (keysPressed.ArrowRight) dx += 1;
+  if (keysPressed.ArrowLeft)  dx -= 1;
+  if (keysPressed.ArrowDown)  dy += 1;
+  if (keysPressed.ArrowUp)    dy -= 1;
+  const mag = Math.hypot(dx, dy);
+  if (mag === 0) return null;
+  return { x: dx / mag, y: dy / mag };
+}
 
-  // Exclude the node we just came from (if there is any) unless it is our only option.
-  let nonBackNeighbors = validNeighbors.filter(n => !lastGraphNode || n.id !== lastGraphNode.id);
+// ----------------------
+// Modified chooseNextNode:
+// It scans all neighbors of the current node and, for each neighbor, computes the unit vector
+// from the current node to that neighbor. It then compares its angle with the desired direction.
+// (Additionally, for centroid-to-centroid moves, it only allows moves that are nearly radially aligned.)
+// ----------------------
+function chooseNextNode(currentNode, desiredDir) {
+  const currentPos = currentNode.pos;
+  const up    = keysPressed.ArrowUp;
+  const down  = keysPressed.ArrowDown;
+  const left  = keysPressed.ArrowLeft;
+  const right = keysPressed.ArrowRight;
 
-  // If there is exactly one neighbor (ignoring the previous node), then use it automatically.
-  if (nonBackNeighbors.length === 1) {
-    // This lets the ball continue moving along a corridor until it reaches a junction.
-    return nonBackNeighbors[0];
-  }
-  // Otherwise, if we have more than one candidate, use them;
-  // if none remain after exclusion but validNeighbors is not empty, fall back to validNeighbors.
-  let candidates = nonBackNeighbors.length > 0 ? nonBackNeighbors : validNeighbors;
+  let candidates = [];
 
-  // Now, if there's more than one candidate, select the one that best aligns with the pointer direction.
-  let bestNode = null;
-  let bestDot = -Infinity;
-
-  // Normalize the pointer movement direction.
-  let desiredMag = Math.hypot(direction.x, direction.y);
-  if (desiredMag === 0) return null;
-  let normDirection = { x: direction.x / desiredMag, y: direction.y / desiredMag };
-
-  // Evaluate each candidate.
-  for (let neighbor of candidates) {
-    // Compute vector from currentNode to neighbor.
-    let vec = {
-      x: neighbor.pos.x - currentNode.pos.x,
-      y: neighbor.pos.y - currentNode.pos.y
-    };
-    let mag = Math.hypot(vec.x, vec.y);
-    if (mag === 0) continue;
-    let normVec = { x: vec.x / mag, y: vec.y / mag };
-
-    // The dot product represents how well the neighbor aligns with the desired direction.
-    let dot = normVec.x * normDirection.x + normVec.y * normDirection.y;
-    if (dot > bestDot) {
-      bestDot = dot;
-      bestNode = neighbor;
+  // INTERSECTION test: require the candidate to satisfy ALL pressed directions.
+  currentNode.neighbors.forEach(neighborId => {
+    const neighbor = graphNodes.find(n => n.id === neighborId);
+    if (!neighbor) return;
+    if (isEdgeBlocked(currentNode, neighbor)) return;
+    const candidatePos = neighbor.pos;
+    
+    let valid = true;
+    // For key directions, "up" means smaller y and "right" means larger x, etc.
+    if (right && candidatePos.x < currentPos.x) valid = false;
+    if (left  && candidatePos.x > currentPos.x) valid = false;
+    if (up    && candidatePos.y > currentPos.y) valid = false;
+    if (down  && candidatePos.y < currentPos.y) valid = false;
+    
+    if (valid) {
+      candidates.push(neighbor);
     }
+  });
+
+  // FALLBACK: If no candidate meets all conditions, use a UNION test (candidate meets at least one condition).
+  if (candidates.length === 0) {
+    currentNode.neighbors.forEach(neighborId => {
+      const neighbor = graphNodes.find(n => n.id === neighborId);
+      if (!neighbor) return;
+      if (isEdgeBlocked(currentNode, neighbor)) return;
+      const candidatePos = neighbor.pos;
+      
+      let valid = false;
+      if (right && candidatePos.x >= currentPos.x) valid = true;
+      if (left  && candidatePos.x <= currentPos.x) valid = true;
+      if (up    && candidatePos.y <= currentPos.y) valid = true;
+      if (down  && candidatePos.y >= currentPos.y) valid = true;
+      
+      if (valid) {
+        candidates.push(neighbor);
+      }
+    });
   }
 
-  if (bestNode) {
-    console.log(`Chosen neighbor ${bestNode.id} with dot product ${bestDot.toFixed(3)}`);
+  // Now choose the candidate whose direction is closest to the desired direction.
+  let bestCandidate = null;
+  let bestAngleDiff = Infinity;
+  const desiredAngle = Math.atan2(desiredDir.y, desiredDir.x);
+
+  candidates.forEach(candidate => {
+    // Compute the vector from the current node to this candidate.
+    const vec = {
+      x: candidate.pos.x - currentPos.x,
+      y: candidate.pos.y - currentPos.y
+    };
+    const candidateAngle = Math.atan2(vec.y, vec.x);
+    let angleDiff = Math.abs(candidateAngle - desiredAngle);
+    if (angleDiff > Math.PI) {
+      angleDiff = 2 * Math.PI - angleDiff;
+    }
+    if (angleDiff < bestAngleDiff) {
+      bestAngleDiff = angleDiff;
+      bestCandidate = candidate;
+    }
+  });
+
+  if (bestCandidate) {
+    console.log(`Chosen neighbor ${bestCandidate.id} with angle diff ${(bestAngleDiff * 180 / Math.PI).toFixed(1)}°`);
   } else {
-    console.log(`No eligible neighbor found from node ${currentNode.id}`);
+    console.log(`No candidate found from node ${currentNode.id}`);
   }
-  return bestNode;
+  
+  return bestCandidate;
 }
 
 
 
+// ----------------------
+// Key event listeners
+// ----------------------
 document.addEventListener('keydown', (event) => {
-    if (gameOver) return; // Stop processing if game is over.
-    let direction = null;
-    switch (event.key) {
-      case 'ArrowUp':    direction = { x: 0, y: -1 }; break;
-      case 'ArrowDown':  direction = { x: 0, y: 1 };  break;
-      case 'ArrowLeft':  direction = { x: -1, y: 0 }; break;
-      case 'ArrowRight': direction = { x: 1, y: 0 };  break;
-      default: return;
-    }
+  return;
+  // Only respond to arrow keys.
+  if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  
+  // Mark this key as pressed.
+  keysPressed[event.key] = true;
+  
 
-    let currentNode = getCurrentGraphNode();
-    if (!currentNode) {
-      // Snap to closest node if none are close.
-      let closestNode = graphNodes.reduce((prev, curr) => {
-        return (distanceBetweenPoints(circle, curr.pos) < distanceBetweenPoints(circle, prev.pos)) ? curr : prev;
-      }, graphNodes[0]);
-      circle.x = closestNode.pos.x;
-      circle.y = closestNode.pos.y;
-      redraw();
-      return;
-    }
-
-    let nextNode = chooseNextNode(currentNode, direction);
-    if (nextNode) {
-      // Instead of an immediate jump, animate the ball's movement.
-      if (!isPathCollidingWithMaze({ x: circle.x, y: circle.y, radius: circle.radius }, nextNode.pos.x, nextNode.pos.y)) {
-        moveBallTo(nextNode);
+  // Start the move interval if it’s not already running.
+  if (!moveInterval) {
+    moveInterval = setInterval(() => {
+      
+      // Compute the desired direction based on currently pressed keys.
+      const desiredDir = getDesiredDirection();
+      if (!desiredDir) return;
+      
+      // Get the current graph node (snap to closest if needed).
+      let currentNode = getCurrentGraphNode();
+      if (!currentNode) {
+        let closestNode = graphNodes.reduce((prev, curr) =>
+          (distanceBetweenPoints(circle, curr.pos) < distanceBetweenPoints(circle, prev.pos)) ? curr : prev,
+          graphNodes[0]
+        );
+        // Optionally snap the circle to the closest node.
+        // circle.x = closestNode.pos.x;
+        // circle.y = closestNode.pos.y;
+        redraw();
+        currentNode = closestNode;
       }
-    }
-  });
+      
+      // Choose the best neighbor (connected node) in the desired direction.
+      let nextNode = chooseNextNode(currentNode, desiredDir);
+      if (nextNode) {
+        // Before moving, ensure the path is not colliding with maze walls.
+        if (!isPathCollidingWithMaze({ x: circle.x, y: circle.y, radius: circle.radius }, nextNode.pos.x, nextNode.pos.y)) {
+          moveBallTo(nextNode);
+        }
+      }
+      
+    }, 300); // Adjust interval (ms) as desired.
+  }
+});
 
+document.addEventListener('keyup', (event) => {
+  return;
+  if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  
+  keysPressed[event.key] = false;
+  
+  // Debug: log the current keysPressed state.
+  // console.log('KeyUp:', keysPressed);
+
+  // If no arrow keys are pressed, stop the interval.
+  if (!keysPressed.ArrowUp && !keysPressed.ArrowDown && !keysPressed.ArrowLeft && !keysPressed.ArrowRight) {
+    clearInterval(moveInterval);
+    moveInterval = null;
+    isMoving = false;
+  }
+});
+
+
+// ----------------------
+// Movement animation (as before)
+// ----------------------
+function moveBallTo(nextNode) {
+  if (isMoving) return;
+  isMoving = true;
+
+  const startPos = { x: circle.x, y: circle.y };
+  const endPos = { x: nextNode.pos.x, y: nextNode.pos.y };
+
+  animateMovement(startPos, endPos, 300, () => {
+      // Force the circle to exactly match the node's position.
+      circle.x = nextNode.pos.x;
+      circle.y = nextNode.pos.y;
+
+      lastGraphNode = nextNode;
+      isMoving = false;
+
+      // Reset key state so that keys aren't considered pressed inadvertently.
+      keysPressed.ArrowUp = false;
+      keysPressed.ArrowDown = false;
+      keysPressed.ArrowLeft = false;
+      keysPressed.ArrowRight = false;
+
+      // Optionally, you can also force a re–snap of the current node:
+      // (If getCurrentGraphNode() is used elsewhere, it will now return nextNode correctly.)
+      checkCollisions();
+  });
+}
 
   // ***** Mouse/Touch Controls *****
 
@@ -1760,13 +1861,20 @@ function easeInOutQuad(t) {
 
 
   function moveBallTo(nextNode) {
+    if (isMoving) return;
+    isMoving = true;
+    
     const startPos = { x: circle.x, y: circle.y };
     const endPos = { x: nextNode.pos.x, y: nextNode.pos.y };
-
+    
     animateMovement(startPos, endPos, 300, () => {
-      lastGraphNode = nextNode; // Update lastGraphNode here.
+      lastGraphNode = nextNode;
+      isMoving = false;
     });
   }
+  
+  
+  
 
 
 
